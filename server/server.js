@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import connectDB from "./config/db.js";
 
 dotenv.config();
 
@@ -15,6 +16,16 @@ app.get('/health', (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+const startServer = async () => {
+    try {
+        await connectDB();
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+        process.exit(1);
+    }
+};
+
+startServer();

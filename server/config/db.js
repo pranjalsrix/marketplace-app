@@ -6,4 +6,9 @@ const connectDB = async () => {
     console.log("Database:", mongoose.connection.name);
 };
 
-export default connectDB;
+const disconnectDB = async () => {
+    await mongoose.connection.close();
+    console.log("MongoDB Disconnected");
+};
+
+export {connectDB, disconnectDB};

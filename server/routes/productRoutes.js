@@ -1,21 +1,22 @@
 import express from 'express';
 import Product from '../models/Product.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import roleMiddleware from '../middleware/roleMiddleware.js';
 
 const router = express.Router();
 
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, roleMiddleware('seller'), async (req, res) => {
     try {
-        const { name, description, price, image, seller } = req.body;
+        const { name, description, price, image} = req.body;
 
-        const products = await Product.create({
+        const product = await Product.create({
             name,
             description,
             price,
             image,
             seller: req.user.userId,
         });
-        res.status(201).json(products);
+        res.status(201).json(product);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -27,7 +28,7 @@ router.get('/', async (req, res) => {
 
         res.status(200).json(products);
     } catch (error) {
-        res.status(400).json({
+        res.status(500).json({
             message: "Server error",
         });
     }
@@ -51,7 +52,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, roleMiddleware('seller'), async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
 
@@ -84,7 +85,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, roleMiddleware('seller'), async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
 
